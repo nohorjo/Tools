@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.regex.PatternSyntaxException;
 
@@ -7,9 +8,8 @@ public class Search {
 		try {
 			String path = args[0];
 			String regex = args[1];
-			File[] files = new File(path).listFiles();
 
-			search(regex, files);
+			search(regex, new File(path));
 
 		} catch (ArrayIndexOutOfBoundsException e) {
 			System.out.println("Usage:\n\tsearch path pattern");
@@ -18,14 +18,21 @@ public class Search {
 		}
 	}
 
-	private static void search(String regex, File[] files) throws IOException {
+	private static void search(String regex, File file) throws IOException {
+		FileFilter filter = new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.isDirectory() || pathname.getName().matches(regex);
+			}
+		};
+		File[] files = file.listFiles(filter);
 		if (files != null) {
 			for (File f : files) {
-				if (f.getName().matches(regex)) {
-					System.out.println(f.getCanonicalPath());
-				}
+
 				if (f.isDirectory()) {
-					search(regex, f.listFiles());
+					search(regex, f);
+				} else {
+					System.out.println(f.getCanonicalPath());
 				}
 			}
 		} else {
