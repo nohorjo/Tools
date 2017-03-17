@@ -36,7 +36,7 @@ public class Search {
 				}
 			}
 		} else {
-			System.err.println("Invalid path");
+			System.err.println("Invalid path: " + file.getCanonicalPath());
 		}
 	}
 }
