@@ -1,19 +1,22 @@
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnmappableCharacterException;
 import java.nio.file.Files;
 import java.util.regex.PatternSyntaxException;
 
 import nohorjo.cli.CLIArgs;
 
 public class Search {
-	private static CLIArgs cli;
 	private static String inFileRegex;
+	private static String startingPath;
 
 	public static void main(String[] args) throws IOException {
 		try {
-			cli = new CLIArgs(args);
-			String path = cli.getString("path", ".");
+			CLIArgs cli = new CLIArgs(args);
+			File f = new File(cli.getString("path", "."));
+			startingPath = f.getCanonicalPath();
 			String regex = cli.getString("$1");
 
 			try {
@@ -21,7 +24,7 @@ public class Search {
 			} catch (NullPointerException e) {
 			}
 
-			search(regex, new File(path));
+			search(regex, f);
 
 		} catch (NullPointerException e) {
 			System.out.println("Usage:\n\tsearch [path=<path>] <file_name_pattern> [in-file=<search_pattern>]");
@@ -40,13 +43,20 @@ public class Search {
 		File[] files = file.listFiles(filter);
 		if (files != null) {
 			for (File f : files) {
-				String path = f.getCanonicalPath();
+				String path = f.getCanonicalPath().replace(startingPath, "");
 				if (f.isDirectory()) {
 					search(regex, f);
 				} else if (inFileRegex != null) {
-					String contents = new String(Files.readAllBytes(f.toPath())).replaceAll("\\s", " ");
-					if (contents.matches(inFileRegex)) {
-						System.out.println("\r" + path);
+					int ln = 0;
+					try {
+						for (String line : Files.readAllLines(f.toPath(), Charset.defaultCharset())) {
+							ln++;
+							if (line.matches(inFileRegex)) {
+								System.out.println(path + "\tline:" + ln);
+							}
+						}
+					} catch (UnmappableCharacterException e) {
+						// skip binary file
 					}
 				} else {
 					System.out.println(path);
