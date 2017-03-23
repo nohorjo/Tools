@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import nohorjo.cli.CLIArgs;
+import nohorjo.out.PaddedPrintStream;
 
 public class Search {
 	private static String inFileRegex;
@@ -15,6 +16,7 @@ public class Search {
 	private static boolean verbose;
 
 	public static void main(String[] args) throws IOException {
+		System.setOut(new PaddedPrintStream(System.out));
 		try {
 			CLIArgs cli = new CLIArgs(args);
 			File f = new File(cli.getString("path", "."));
