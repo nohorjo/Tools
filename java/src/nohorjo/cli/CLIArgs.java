@@ -24,7 +24,7 @@ public class CLIArgs {
 
 	public String getString(String arg, String defaultValue) {
 		try {
-			return args.get(arg).trim();
+			return getString(arg);
 		} catch (NullPointerException e) {
 			return defaultValue;
 		}

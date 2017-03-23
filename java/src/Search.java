@@ -21,7 +21,12 @@ public class Search {
 			CLIArgs cli = new CLIArgs(args);
 			File f = new File(cli.getString("path", "."));
 			startingPath = f.getCanonicalPath();
-			String regex = cli.getString("$1", ".*" + Pattern.quote(cli.getString("lit")) + ".*");
+			String regex;
+			try {
+				regex = cli.getString("$1");
+			} catch (NullPointerException e1) {
+				regex = cli.getString(".*" + Pattern.quote(cli.getString("lit")) + ".*");
+			}
 			verbose = cli.getBoolean("verbose", false);
 
 			try {
