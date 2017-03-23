@@ -17,13 +17,13 @@ public class PaddedPrintStream extends PrintStream {
 		StringBuilder sb = new StringBuilder(x);
 		for (int i = sb.length(); i <= len; i++) {
 			if (endsWithR) {
-				sb.insert(i-1, " ");
+				sb.insert(i - 1, " ");
 			} else {
 				sb.append(" ");
 			}
 		}
 		super.print(sb.toString());
-		len = x.length();
+		len = endsWithR ? x.length() : 0;
 	}
 
 	@Override
@@ -32,18 +32,12 @@ public class PaddedPrintStream extends PrintStream {
 		StringBuilder sb = new StringBuilder(x);
 		for (int i = sb.length(); i <= len; i++) {
 			if (endsWithR) {
-				sb.insert(i-1, " ");
+				sb.insert(i - 1, " ");
 			} else {
 				sb.append(" ");
 			}
 		}
 		super.println(sb.toString());
-		len = x.length();
-	}
-
-	public static void main(String[] args) {
-		System.setOut(new PaddedPrintStream(System.out));
-		System.out.print("hello\r");
-		System.out.print("yo\r");
+		len = endsWithR ? x.length() : 0;
 	}
 }

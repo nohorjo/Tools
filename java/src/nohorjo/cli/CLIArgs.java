@@ -25,7 +25,7 @@ public class CLIArgs {
 	public String getString(String arg, String defaultValue) {
 		try {
 			return getString(arg);
-		} catch (NullPointerException e) {
+		} catch (InvalidCLIArgException e) {
 			return defaultValue;
 		}
 	}
@@ -33,7 +33,7 @@ public class CLIArgs {
 	public long getLong(String arg, long defaultValue) {
 		try {
 			return Long.parseLong(getString(arg));
-		} catch (NullPointerException e) {
+		} catch (InvalidCLIArgException e) {
 			return defaultValue;
 		}
 	}
@@ -41,7 +41,7 @@ public class CLIArgs {
 	public double getDouble(String arg, double defaultValue) {
 		try {
 			return Double.parseDouble(getString(arg));
-		} catch (NullPointerException e) {
+		} catch (InvalidCLIArgException e) {
 			return defaultValue;
 		}
 	}
@@ -49,28 +49,32 @@ public class CLIArgs {
 	public boolean getBoolean(String arg, boolean defaultValue) {
 		try {
 			return Boolean.parseBoolean(getString(arg));
-		} catch (NullPointerException e) {
+		} catch (InvalidCLIArgException e) {
 			return defaultValue;
 		}
 	}
 
-	public String getString(String arg) {
-		return args.get(arg).trim();
+	public String getString(String arg) throws InvalidCLIArgException {
+		try {
+			return args.get(arg).trim();
+		} catch (NullPointerException e) {
+			throw new InvalidCLIArgException();
+		}
 	}
 
-	public long getLong(String arg) {
+	public long getLong(String arg) throws NumberFormatException, InvalidCLIArgException {
 		return Long.parseLong(getString(arg));
 	}
 
-	public double getDouble(String arg) {
+	public double getDouble(String arg) throws NumberFormatException, InvalidCLIArgException {
 		return Double.parseDouble(getString(arg));
 	}
 
-	public boolean getBoolean(String arg) {
+	public boolean getBoolean(String arg) throws InvalidCLIArgException {
 		return Boolean.parseBoolean(getString(arg));
 	}
 
-	public List<String> getList(String arg, String delim) {
+	public List<String> getList(String arg, String delim) throws InvalidCLIArgException {
 		return new ArrayList<>(Arrays.asList(getString(arg).split(delim)));
 	}
 }

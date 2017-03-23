@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnmappableCharacterException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import nohorjo.cli.CLIArgs;
+import nohorjo.cli.InvalidCLIArgException;
 import nohorjo.out.PaddedPrintStream;
 
 public class Search {
 	private static String inFileRegex;
 	private static String startingPath;
 	private static boolean verbose;
+	private static List<String> exclude = new ArrayList<>();
 
 	public static void main(String[] args) throws IOException {
 		System.setOut(new PaddedPrintStream(System.out));
@@ -21,24 +25,49 @@ public class Search {
 			CLIArgs cli = new CLIArgs(args);
 			File f = new File(cli.getString("path", "."));
 			startingPath = f.getCanonicalPath();
+			verbose = cli.getBoolean("verbose", false);
+
 			String regex;
 			try {
 				regex = cli.getString("$1");
-			} catch (NullPointerException e1) {
+			} catch (InvalidCLIArgException e1) {
 				regex = cli.getString(".*" + Pattern.quote(cli.getString("lit")) + ".*");
 			}
-			verbose = cli.getBoolean("verbose", false);
 
 			try {
-				inFileRegex = cli.getString("in-file", ".*" + Pattern.quote(cli.getString("in-file-lit")) + ".*");
-			} catch (NullPointerException e) {
+				inFileRegex = ".*" + Pattern.quote(cli.getString("in-file-lit")) + ".*";
+			} catch (InvalidCLIArgException e) {
+				inFileRegex = cli.getString("in-file", null);
+			}
+
+			try {
+				exclude = cli.getList("exclude", "/");
+			} catch (InvalidCLIArgException e) {
+			}
+			try {
+				for (String lit : cli.getList("exclude-lit", "/")) {
+					exclude.add(".*" + Pattern.quote(lit) + ".*");
+				}
+			} catch (InvalidCLIArgException e) {
 			}
 
 			search(regex, f);
 
-		} catch (NullPointerException e) {
+		} catch (InvalidCLIArgException e) {
+			System.out.println("Usage:\n\tsearch [path=<path>] (<file_name_pattern> | lit=<literal_search>) [OPTIONS]");
+			System.out.println("\nOptions:\n");
+			System.out.print("in-file-lit\t");
+			System.out.println("Literal text to search for in files.");
+			System.out.print("in-file\t\t");
+			System.out.println("Regex to search for. Ignored if in-file-lit is set.");
+			System.out.print("verbose\t\t");
+			System.out.println("(true|false) flag to set verbose.");
+			System.out.print("exclude-lit\t");
 			System.out.println(
-					"Usage:\n\tsearch [path=<path>] (<file_name_pattern> | lit=<literal_search>) [in-file=<search_pattern> | in-file-lit=<literal_search>] [verbose=(true|false)]");
+					"Slash [/] seperated list of strings such that if a file name includes one then it will be ignored.");
+			System.out.print("exclude\t");
+			System.out.println(
+					"Slash [/] seperated list of regular expressions such that if a file name matches one then it will be ignored.");
 		} catch (PatternSyntaxException e) {
 			System.err.println("Invalid pattern");
 		}
@@ -48,7 +77,13 @@ public class Search {
 		FileFilter filter = new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
-				return pathname.isDirectory() || pathname.getName().matches(regex);
+				String name = pathname.getName();
+				for (String regex : exclude) {
+					if (name.matches(regex)) {
+						return false;
+					}
+				}
+				return pathname.isDirectory() || name.matches(regex);
 			}
 		};
 		File[] files = file.listFiles(filter);
