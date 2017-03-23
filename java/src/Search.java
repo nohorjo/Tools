@@ -18,6 +18,7 @@ public class Search {
 	private static String startingPath;
 	private static boolean verbose;
 	private static List<String> exclude = new ArrayList<>();
+	private static boolean fullPath;
 
 	public static void main(String[] args) throws IOException {
 		System.setOut(new PaddedPrintStream(System.out));
@@ -26,6 +27,7 @@ public class Search {
 			File f = new File(cli.getString("path", "."));
 			startingPath = f.getCanonicalPath();
 			verbose = cli.getBoolean("verbose", false);
+			fullPath = cli.getBoolean("full-path", false);
 
 			String regex;
 			try {
@@ -68,6 +70,8 @@ public class Search {
 			System.out.print("exclude\t");
 			System.out.println(
 					"Slash [/] seperated list of regular expressions such that if a file name matches one then it will be ignored.");
+			System.out.print("full-path\t");
+			System.out.println("(true|false) flag to set if files should display full or relative paths.");
 		} catch (PatternSyntaxException e) {
 			System.err.println("Invalid pattern");
 		}
@@ -89,7 +93,10 @@ public class Search {
 		File[] files = file.listFiles(filter);
 		if (files != null) {
 			for (File f : files) {
-				String path = f.getCanonicalPath().replace(startingPath, "");
+				String path = f.getCanonicalPath();
+				if (!fullPath) {
+					path = path.replace(startingPath, "");
+				}
 				if (f.isDirectory()) {
 					if (verbose) {
 						System.out.print("Searching in " + path + "\r");
