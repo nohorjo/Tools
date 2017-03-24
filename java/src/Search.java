@@ -33,7 +33,7 @@ public class Search {
 			try {
 				regex = cli.getString("$1");
 			} catch (InvalidCLIArgException e1) {
-				regex = cli.getString(".*" + Pattern.quote(cli.getString("lit")) + ".*");
+				regex = ".*" + Pattern.quote(cli.getString("lit")) + ".*";
 			}
 
 			try {
