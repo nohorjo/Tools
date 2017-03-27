@@ -19,6 +19,7 @@ public class Search {
 	private static boolean verbose;
 	private static List<String> exclude = new ArrayList<>();
 	private static boolean fullPath;
+	private static boolean outLine;
 
 	public static void main(String[] args) throws IOException {
 		System.setOut(new PaddedPrintStream(System.out));
@@ -28,6 +29,7 @@ public class Search {
 			startingPath = f.getCanonicalPath();
 			verbose = cli.getBoolean("verbose", false);
 			fullPath = cli.getBoolean("full-path", false);
+			outLine = cli.getBoolean("out-line", false);
 
 			String regex;
 			try {
@@ -72,6 +74,8 @@ public class Search {
 					"Slash [/] seperated list of regular expressions such that if a file name matches one then it will be ignored.");
 			System.out.print("full-path\t");
 			System.out.println("(true|false) flag to set if files should display full or relative paths.");
+			System.out.print("out-line\t");
+			System.out.println("(true|false) flag to set if the line found in the file should be outputted");
 		} catch (PatternSyntaxException e) {
 			System.err.println("Invalid pattern");
 		}
@@ -111,7 +115,7 @@ public class Search {
 						for (String line : Files.readAllLines(f.toPath(), Charset.defaultCharset())) {
 							ln++;
 							if (line.matches(inFileRegex)) {
-								System.out.println(path + "\tline:" + ln);
+								System.out.println(path + "\tline:" + ln + "\t" + (outLine ? line : ""));
 							}
 						}
 					} catch (UnmappableCharacterException e) {
