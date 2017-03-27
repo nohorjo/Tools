@@ -13,7 +13,7 @@ public class Wget {
 		try {
 			Url = new URL(args[0]);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("Usage:\n\twget url");
+			System.out.println("Usage:\n\twget url <output to console (true|false)>");
 			return;
 		}
 		HttpURLConnection conn = (HttpURLConnection) Url.openConnection();
@@ -29,6 +29,13 @@ public class Wget {
 			}
 		}
 		String resp = result.toString();
+		try {
+			if (Boolean.parseBoolean(args[1])) {
+				System.out.println(resp);
+				return;
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+		}
 		try (FileOutputStream fos = new FileOutputStream(Url.getPath().replaceAll(".*/", ""))) {
 			fos.write(resp.getBytes());
 		}
