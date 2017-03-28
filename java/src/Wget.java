@@ -28,7 +28,7 @@ public class Wget {
 				}
 			} catch (InvalidCLIArgException e) {
 			} catch (ArrayIndexOutOfBoundsException e) {
-				throw new InvalidCLIArgException();
+				throw new InvalidCLIArgException("Invalid headers");
 			}
 			try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));) {
 				String line;
@@ -45,7 +45,7 @@ public class Wget {
 				fos.write(resp.getBytes());
 			}
 		} catch (InvalidCLIArgException e) {
-			e.printStackTrace();
+			e.printMessage();
 			System.out.println("Usage:\n\twget url [Options...]");
 			System.out.println("Options:");
 			System.out.print("console\t");
