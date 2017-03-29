@@ -54,7 +54,7 @@ public class Wget {
 				}
 			}
 			String resp = result.toString();
-			if (cli.getBoolean("console", false)) {
+			if (cli.getBoolean("console", true)) {
 				System.out.println(resp);
 				return;
 			}
