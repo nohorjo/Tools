@@ -33,11 +33,18 @@ public class Wget {
 			} catch (ArrayIndexOutOfBoundsException e) {
 				throw new InvalidCLIArgException("Invalid headers");
 			}
-			try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
-				try {
-					wr.write(cli.getString("data").getBytes());
-				} catch (InvalidCLIArgException e) {
-					wr.write(Files.readAllBytes(Paths.get(cli.getString("file"))));
+			if (!conn.getRequestMethod().equals("GET")) {
+				conn.setDoOutput(true);
+				try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+					try {
+						wr.write(cli.getString("data").getBytes());
+					} catch (InvalidCLIArgException e) {
+						try {
+							wr.write(Files.readAllBytes(Paths.get(cli.getString("file"))));
+						} catch (InvalidCLIArgException e1) {
+							throw new InvalidCLIArgException("data or file not set");
+						}
+					}
 				}
 			}
 			try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));) {
