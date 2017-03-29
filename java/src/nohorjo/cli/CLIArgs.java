@@ -14,7 +14,7 @@ public class CLIArgs {
 		for (int i = 0, j = 0; i < args.length; i++) {
 			String arg = args[i];
 			if (arg.contains("=")) {
-				String[] argParts = arg.split("=");
+				String[] argParts = arg.split("=", 2);
 				this.args.put(argParts[0], argParts[1]);
 			} else {
 				this.args.put("$" + ++j, arg);
