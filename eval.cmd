@@ -1,2 +1,2 @@
 @echo off
-java -cp %~dp0\java\cp;%~dp0\java\lib\*.jar Calc %*
+java -cp %~dp0\java\cp;%~dp0\java\lib\* Calc %*
