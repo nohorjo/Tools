@@ -1,2 +1,2 @@
 @echo off
-java -cp %~dp0\java\cp Mkdirs %*
+java -cp %~dp0\java\cp;%~dp0\java\lib\*.jar Mkdirs %*

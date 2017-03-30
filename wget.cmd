@@ -1,2 +1,2 @@
 @echo off
-java -cp %~dp0\java\cp Wget %*
+java -cp %~dp0\java\cp;%~dp0\java\lib\*.jar Wget %*
