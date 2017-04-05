@@ -1,10 +1,15 @@
 import java.io.File;
 
 import nohorjo.cli.CLIArgs;
+import nohorjo.out.PaddedPrintStream;
 
 public class DU {
+	private static boolean verbose;
+
 	public static void main(String[] args) {
+		System.setOut(new PaddedPrintStream(System.out));
 		CLIArgs cli = new CLIArgs(args);
+		verbose = cli.getBoolean("verbose", false);
 		File[] fs = new File(cli.getString("$1", ".")).listFiles();
 		if (fs != null) {
 			for (File f : fs) {
@@ -14,6 +19,9 @@ public class DU {
 	}
 
 	private static long getLength(File f) {
+		if (verbose) {
+			System.out.print("Analysing: " + f.getPath() + "\r");
+		}
 		long length = 0;
 		if (f.isFile()) {
 			length = f.length();
