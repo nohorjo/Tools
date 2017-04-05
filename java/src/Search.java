@@ -20,6 +20,7 @@ public class Search {
 	private static List<String> exclude = new ArrayList<>();
 	private static boolean fullPath;
 	private static boolean outLine;
+	private static boolean symLink;
 
 	public static void main(String[] args) throws IOException {
 		System.setOut(new PaddedPrintStream(System.out));
@@ -30,6 +31,7 @@ public class Search {
 			verbose = cli.getBoolean("verbose", false);
 			fullPath = cli.getBoolean("full-path", false);
 			outLine = cli.getBoolean("out-line", false);
+			symLink = cli.getBoolean("sym-link", false);
 
 			String regex;
 			try {
@@ -76,6 +78,8 @@ public class Search {
 			System.out.println("(true|false) flag to set if files should display full or relative paths.");
 			System.out.print("out-line\t");
 			System.out.println("(true|false) flag to set if the line found in the file should be outputted");
+			System.out.print("sym-link\t");
+			System.out.println("(true|false) flag to set if symbolic linked directories should be followed");
 		} catch (PatternSyntaxException e) {
 			System.err.println("Invalid pattern");
 		}
@@ -102,10 +106,14 @@ public class Search {
 					path = path.replace(startingPath, "");
 				}
 				if (f.isDirectory()) {
-					if (verbose) {
-						System.out.print("Searching in " + path + "\r");
+					if (Files.isSymbolicLink(f.toPath()) && !symLink) {
+						System.out.println("Skipping symbolic link: " + path);
+					} else {
+						if (verbose) {
+							System.out.print("Searching in " + path + "\r");
+						}
+						search(regex, f);
 					}
-					search(regex, f);
 				} else if (inFileRegex != null) {
 					if (verbose) {
 						System.out.print("Searching file: " + path + "\r");
