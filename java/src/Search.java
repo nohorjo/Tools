@@ -19,7 +19,7 @@ public class Search {
 	private static boolean verbose;
 	private static List<String> exclude = new ArrayList<>();
 	private static boolean fullPath;
-	private static boolean outLine;
+	private static int outLine;
 	private static boolean symLink;
 
 	public static void main(String[] args) throws IOException {
@@ -30,7 +30,7 @@ public class Search {
 			startingPath = f.getCanonicalPath();
 			verbose = cli.getBoolean("verbose", false);
 			fullPath = cli.getBoolean("full-path", false);
-			outLine = cli.getBoolean("out-line", false);
+			outLine = (int) cli.getLong("out-line", 0);
 			symLink = cli.getBoolean("sym-link", false);
 
 			String regex;
@@ -71,13 +71,14 @@ public class Search {
 			System.out.print("exclude-lit\t");
 			System.out.println(
 					"Slash [/] seperated list of strings such that if a file name includes one then it will be ignored.");
-			System.out.print("exclude\t");
+			System.out.print("exclude\t\t");
 			System.out.println(
 					"Slash [/] seperated list of regular expressions such that if a file name matches one then it will be ignored.");
 			System.out.print("full-path\t");
 			System.out.println("(true|false) flag to set if files should display full or relative paths.");
 			System.out.print("out-line\t");
-			System.out.println("(true|false) flag to set if the line found in the file should be outputted");
+			System.out.println(
+					"(0|1|2) 0 = do not output line, 1 = output line, 2 = output only line (no filename or line numbers)");
 			System.out.print("sym-link\t");
 			System.out.println("(true|false) flag to set if symbolic linked directories should be followed");
 		} catch (PatternSyntaxException e) {
@@ -123,7 +124,8 @@ public class Search {
 						for (String line : Files.readAllLines(f.toPath(), Charset.defaultCharset())) {
 							ln++;
 							if (line.matches(inFileRegex)) {
-								System.out.println(path + "\tline:" + ln + "\t" + (outLine ? line : ""));
+								System.out.println((outLine != 2 ? path + "\tline:" + ln + "\t" : "")
+										+ (outLine != 0 ? line : ""));
 							}
 						}
 					} catch (UnmappableCharacterException e) {
