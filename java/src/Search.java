@@ -124,8 +124,8 @@ public class Search {
 						for (String line : Files.readAllLines(f.toPath(), Charset.defaultCharset())) {
 							ln++;
 							if (line.matches(inFileRegex)) {
-								System.out.println((outLine != 2 ? path + "\tline:" + ln + "\t" : "")
-										+ (outLine != 0 ? line : ""));
+								System.out.println((outLine == 2 ? "\n" : path + "\tline:" + ln + "\t")
+										+ (outLine == 0 ? "" : line));
 							}
 						}
 					} catch (UnmappableCharacterException e) {
