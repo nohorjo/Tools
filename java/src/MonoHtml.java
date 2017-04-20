@@ -55,7 +55,7 @@ public class MonoHtml {
 	}
 
 	private static void embedCSS() throws IOException {
-		embed("<link\\s*href=\"[^<]**\".*</link>", "<style>", "</style>", "css");
+		embed("<link\\s*href=\"[^<]*\".*</link>", "<style>", "</style>", "css");
 	}
 
 }
