@@ -51,7 +51,7 @@ public class MonoHtml {
 	}
 
 	private static void embedJS() throws IOException {
-		embed("<script\\s*src=\"[^<]*\".*</scriptt>", "<script>", "</script>", "js");
+		embed("<script\\s*src=\"[^<]*\".*</script>", "<script>", "</script>", "js");
 	}
 
 	private static void embedCSS() throws IOException {
