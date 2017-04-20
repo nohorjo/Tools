@@ -47,7 +47,7 @@ public class MonoHtml {
 	}
 
 	private static void embedImages() throws IOException {
-		embed("<img\\s*src=\".*\"", "<img src=\"", "\"", "images");
+		embed("<img\\s*src=\"[^\"]*\"", "<img src=\"", "\"", "images");
 	}
 
 	private static void embedJS() throws IOException {
