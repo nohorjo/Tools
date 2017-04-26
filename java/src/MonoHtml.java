@@ -14,9 +14,9 @@ public class MonoHtml {
 		file = new File(args[0]).toPath().toAbsolutePath();
 		fileconts = new String(Files.readAllBytes(file)).replace('\n', ' ');
 
-		embedImages();
-		embedJS();
 		embedCSS();
+		embedJS();
+		embedImages();
 
 		System.out.println(fileconts);
 	}

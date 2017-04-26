@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnmappableCharacterException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -14,13 +15,10 @@ import nohorjo.cli.InvalidCLIArgException;
 import nohorjo.out.PaddedPrintStream;
 
 public class Search {
-	private static String inFileRegex;
-	private static String startingPath;
-	private static boolean verbose;
+	private static String inFileRegex, startingPath;
 	private static List<String> exclude = new ArrayList<>();
-	private static boolean fullPath;
+	private static boolean verbose, fullPath, symLink, clearFile;
 	private static int outLine;
-	private static boolean symLink;
 
 	public static void main(String[] args) throws IOException {
 		System.setOut(new PaddedPrintStream(System.out));
@@ -32,6 +30,7 @@ public class Search {
 			fullPath = cli.getBoolean("full-path", false);
 			outLine = (int) cli.getLong("out-line", 0);
 			symLink = cli.getBoolean("sym-link", false);
+			clearFile = cli.getBoolean("clear", false);
 
 			String regex;
 			try {
@@ -106,8 +105,9 @@ public class Search {
 				if (!fullPath) {
 					path = path.replace(startingPath, "");
 				}
+				Path nPath = f.toPath();
 				if (f.isDirectory()) {
-					if (Files.isSymbolicLink(f.toPath()) && !symLink) {
+					if (Files.isSymbolicLink(nPath) && !symLink) {
 						System.out.println("Skipping symbolic link: " + path);
 					} else {
 						if (verbose) {
@@ -121,12 +121,15 @@ public class Search {
 					}
 					int ln = 0;
 					try {
-						for (String line : Files.readAllLines(f.toPath(), Charset.defaultCharset())) {
+						for (String line : Files.readAllLines(nPath, Charset.defaultCharset())) {
 							ln++;
 							if (line.matches(inFileRegex)) {
 								System.out.println((outLine == 2 ? "\n" : path + "\tline:" + ln + "\t")
 										+ (outLine == 0 ? "" : line));
 							}
+						}
+						if (clearFile) {
+							Files.write(nPath, new byte[] {});
 						}
 					} catch (UnmappableCharacterException e) {
 						// skip binary file
