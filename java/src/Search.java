@@ -80,6 +80,8 @@ public class Search {
 					"(0|1|2) 0 = do not output line, 1 = output line, 2 = output only line (no filename or line numbers)");
 			System.out.print("sym-link\t");
 			System.out.println("(true|false) flag to set if symbolic linked directories should be followed");
+			System.out.print("clear\t");
+			System.out.println("(true|false) flag to set if the file should be cleared afterwards");
 		} catch (PatternSyntaxException e) {
 			System.err.println("Invalid pattern");
 		}
