@@ -17,7 +17,7 @@ import nohorjo.out.PaddedPrintStream;
 public class Search {
 	private static String inFileRegex, startingPath;
 	private static List<String> exclude = new ArrayList<>();
-	private static boolean verbose, fullPath, symLink, clearFile;
+	private static boolean verbose, fullPath, symLink, clearFile, recursive;
 	private static int outLine;
 
 	public static void main(String[] args) throws IOException {
@@ -31,6 +31,7 @@ public class Search {
 			outLine = (int) cli.getLong("out-line", 0);
 			symLink = cli.getBoolean("sym-link", false);
 			clearFile = cli.getBoolean("clear", false);
+			recursive = cli.getBoolean("recursive", true);
 
 			String regex;
 			try {
@@ -80,8 +81,10 @@ public class Search {
 					"(0|1|2) 0 = do not output line, 1 = output line, 2 = output only line (no filename or line numbers)");
 			System.out.print("sym-link\t");
 			System.out.println("(true|false) flag to set if symbolic linked directories should be followed");
-			System.out.print("clear\t");
+			System.out.print("clear\t\t");
 			System.out.println("(true|false) flag to set if the file should be cleared afterwards");
+			System.out.print("recursive\t");
+			System.out.println("(true|false) flag to set if subdirectories should be scanned recursively");
 		} catch (PatternSyntaxException e) {
 			System.err.println("Invalid pattern");
 		}
@@ -108,7 +111,7 @@ public class Search {
 					path = path.replace(startingPath, "");
 				}
 				Path nPath = f.toPath();
-				if (f.isDirectory()) {
+				if (f.isDirectory() && recursive) {
 					if (Files.isSymbolicLink(nPath) && !symLink) {
 						System.out.println("Skipping symbolic link: " + path);
 					} else {
