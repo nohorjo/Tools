@@ -111,14 +111,16 @@ public class Search {
 					path = path.replace(startingPath, "");
 				}
 				Path nPath = f.toPath();
-				if (f.isDirectory() && recursive) {
-					if (Files.isSymbolicLink(nPath) && !symLink) {
-						System.out.println("Skipping symbolic link: " + path);
-					} else {
-						if (verbose) {
-							System.out.print("Searching in " + path + "\r");
+				if (f.isDirectory()) {
+					if (recursive) {
+						if (Files.isSymbolicLink(nPath) && !symLink) {
+							System.out.println("Skipping symbolic link: " + path);
+						} else {
+							if (verbose) {
+								System.out.print("Searching in " + path + "\r");
+							}
+							search(regex, f);
 						}
-						search(regex, f);
 					}
 				} else if (inFileRegex != null) {
 					if (verbose) {
