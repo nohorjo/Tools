@@ -48,7 +48,7 @@ public class MonoHtml {
 					replace = "data:image/png;base64, " + Base64.getEncoder().encodeToString(origin);
 					break;
 				case "css":
-					origin = embed(new String(origin), "url\\(\"[^\"]*\"", "url(\"", "\"", "images").getBytes();
+					origin = embed(new String(origin).replace("url(\"","url(src=\""), "url\\(src=\"[^\"]*\"", "url(\"", "\"", "images").getBytes();
 				case "js":
 					replace = new String(origin);
 					break;
