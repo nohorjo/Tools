@@ -11,12 +11,20 @@ public class MonoHtml {
 
 	public static void main(String[] args) throws IOException {
 		file = new File(args[0]).toPath().toAbsolutePath();
-
-		System.out.println(compile(new String(Files.readAllBytes(file))));
+		boolean iframes = false;
+		try {
+			iframes = Boolean.parseBoolean(args[1]);
+		} catch (Exception e) {
+		}
+		System.out.println(compile(new String(Files.readAllBytes(file)), iframes));
 	}
 
-	private static String compile(String source) throws IOException {
-		return embedIframes(embedImages(embedJS(embedCSS(source))));
+	private static String compile(String source, boolean iframes) throws IOException {
+		String compiled = embedImages(embedJS(embedCSS(source)));
+		if (iframes) {
+			compiled = embedIframes(compiled);
+		}
+		return compiled;
 	}
 
 	private static String embed(String input, String regex, String before, String after, String toEmbed)
@@ -48,7 +56,8 @@ public class MonoHtml {
 					replace = "data:image/png;base64, " + Base64.getEncoder().encodeToString(origin);
 					break;
 				case "css":
-					origin = embed(new String(origin).replace("url(\"","url(src=\""), "url\\(src=\"[^\"]*\"", "url(\"", "\"", "images").getBytes();
+					origin = embed(new String(origin).replace("url(\"", "url(src=\""), "url\\(src=\"[^\"]*\"", "url(\"",
+							"\"", "images").getBytes();
 				case "js":
 					replace = new String(origin);
 					break;
