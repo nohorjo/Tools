@@ -140,6 +140,9 @@ public class Search {
 						}
 					} catch (UnmappableCharacterException e) {
 						// skip binary file
+					} catch (IOException e) {
+						System.err.println("Error reading: " + path);
+						System.err.println(e.getMessage());
 					}
 				} else {
 					System.out.println(path);
