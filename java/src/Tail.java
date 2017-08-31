@@ -10,17 +10,24 @@ public class Tail {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		try {
 			File f = new File(args[0]);
-			try (BufferedReader r = new BufferedReader(new FileReader(f))) {
-				try {
-					System.out.println(FileUtils.readLastNLines(f, Integer.parseInt(args[1])));
+			int skip = Integer.MAX_VALUE;
+			try {
+				skip = Integer.parseInt(args[1]);
+			} catch (ArrayIndexOutOfBoundsException e) {
+			}
+			while (true) {
+				try (BufferedReader r = new BufferedReader(new FileReader(f))) {
+					System.out.println(FileUtils.readLastNLines(f, skip));
 					r.skip(f.length());
-				} catch (ArrayIndexOutOfBoundsException e) {
-				}
-				while (true) {
-					String l = r.readLine();
-					if (l != null) {
-						System.out.println(l);
+					long len = f.length();
+					while (len <= f.length()) {
+						String l = r.readLine();
+						if (l != null) {
+							System.out.println(l);
+							len = f.length();
+						}
 					}
+					skip = Integer.MAX_VALUE;
 				}
 			}
 		} catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
